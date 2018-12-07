@@ -1,0 +1,33 @@
+plugins {
+    id 'net.ltgt.apt' version '0.10'
+}
+
+group 'com.ranttu.rapid.personalweb'
+version '0.0.1'
+
+allprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        compileOnly 'org.projectlombok:lombok:1.16.20'
+        compile group: 'com.google.guava', name: 'guava', version: '27.0-jre'
+
+        testCompile 'org.testng:testng:6.11'
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java']
+            resources.srcDirs = ['src/main/resources']
+        }
+
+        test {
+            java.srcDirs = ['test/java']
+            resources.srcDirs = ['test/resources']
+        }
+    }
+}
