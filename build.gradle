@@ -1,7 +1,3 @@
-plugins {
-    id 'net.ltgt.apt' version '0.10'
-}
-
 group 'com.ranttu.rapid.personalweb'
 version '0.0.1'
 
