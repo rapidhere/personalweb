@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
  * @version $Id: WasmSection.java, v 0.1 2018Äê12ÔÂ08ÈÕ 3:50 PM rapid Exp $
  */
 @RequiredArgsConstructor
-abstract public class WasmSection {
+abstract public class Section {
     @Getter
     private final byte sectionId;
 }

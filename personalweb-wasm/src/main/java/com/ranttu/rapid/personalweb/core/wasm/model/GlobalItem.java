@@ -17,5 +17,5 @@ public class GlobalItem {
     private final GlobalType globalType;
 
     @Getter
-    private final WasmInstruction[] instructions;
+    private final Instruction[] instructions;
 }

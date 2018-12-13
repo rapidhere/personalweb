@@ -15,7 +15,7 @@ import lombok.Getter;
  */
 @Getter
 @Builder
-public class WasmModule {
+public class Module {
     /**
      * source for this module
      */

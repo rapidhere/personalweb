@@ -12,7 +12,7 @@ import lombok.Getter;
  * @version $Id: WasmInstruction.java, v 0.1 2018Äê12ÔÂ08ÈÕ 10:13 PM rapid Exp $
  */
 @Builder
-public class WasmInstruction {
+public class Instruction {
     @Getter
     private final byte opcode;
 
@@ -21,11 +21,11 @@ public class WasmInstruction {
     private final BlockType blockType;
 
     @Getter
-    private final WasmInstruction[] blockInstructions;
+    private final Instruction[] blockInstructions;
 
     //~~~ for if instruction
     @Getter
-    private final WasmInstruction[] elseInstructions;
+    private final Instruction[] elseInstructions;
 
     //~~~ for labeled instruction
     @Getter

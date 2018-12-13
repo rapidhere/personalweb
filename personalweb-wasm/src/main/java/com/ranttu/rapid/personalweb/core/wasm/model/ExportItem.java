@@ -25,5 +25,6 @@ public class ExportItem {
     /**
      * depends on export type can be functionIndex/tableIndex/memoryIndex/gloablIndex
      */
+    @Getter
     private final long exportIndex;
 }

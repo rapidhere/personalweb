@@ -4,15 +4,19 @@
  */
 package com.ranttu.rapid.personalweb.core.wasm.model;
 
+import java.util.stream.Stream;
+
 /**
  * @author rapid
  * @version $Id: WasmVectorBasedSection.java, v 0.1 2018Äê12ÔÂ08ÈÕ 5:51 PM rapid Exp $
  */
-public class WasmVectorBasedSection<T> extends WasmSection {
-    /** content of this section */
+public class VectorBasedSection<T> extends Section {
+    /**
+     * content of this section
+     */
     protected T[] items;
 
-    public WasmVectorBasedSection(byte sectionId, T[] items) {
+    public VectorBasedSection(byte sectionId, T[] items) {
         super(sectionId);
         this.items = items;
     }
@@ -23,5 +27,9 @@ public class WasmVectorBasedSection<T> extends WasmSection {
 
     public T get(int i) {
         return items[i];
+    }
+
+    public Stream<T> stream() {
+        return Stream.of(items);
     }
 }

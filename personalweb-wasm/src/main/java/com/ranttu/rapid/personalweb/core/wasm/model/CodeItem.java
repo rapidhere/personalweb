@@ -19,5 +19,5 @@ public class CodeItem {
     private final long[] localCounts;
 
     @Getter
-    private final WasmInstruction[] instructions;
+    private final Instruction[] instructions;
 }

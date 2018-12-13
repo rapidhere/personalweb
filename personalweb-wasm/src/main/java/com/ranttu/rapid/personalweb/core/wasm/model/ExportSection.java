@@ -10,8 +10,15 @@ import com.ranttu.rapid.personalweb.core.wasm.constants.BinCodes;
  * @author rapid
  * @version $Id: ExportSection.java, v 0.1 2018Äê12ÔÂ09ÈÕ 4:01 PM rapid Exp $
  */
-public class ExportSection extends WasmVectorBasedSection<ExportItem> {
+public class ExportSection extends VectorBasedSection<ExportItem> {
     public ExportSection(ExportItem[] items) {
         super(BinCodes.SCT_EXPORT, items);
+    }
+
+    public ExportItem findItem(byte exportType, long exportIndex) {
+        return stream()
+            .filter(item -> item.getExportType() == exportType && item.getExportIndex() == exportIndex)
+            .findAny()
+            .orElse(null);
     }
 }

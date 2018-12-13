@@ -10,7 +10,7 @@ import com.ranttu.rapid.personalweb.core.wasm.constants.BinCodes;
  * @author rapid
  * @version $Id: CodeSection.java, v 0.1 2018Äê12ÔÂ09ÈÕ 4:13 PM rapid Exp $
  */
-public class CodeSection extends WasmVectorBasedSection<CodeItem> {
+public class CodeSection extends VectorBasedSection<CodeItem> {
     public CodeSection(CodeItem[] items) {
         super(BinCodes.SCT_CODE, items);
     }
