@@ -6,11 +6,8 @@ package com.ranttu.rapid.personalweb.core.wasm.compile.export;
 
 import com.google.common.base.Strings;
 import com.ranttu.rapid.personalweb.core.wasm.exception.WasmUnknownError;
-import lombok.SneakyThrows;
 import lombok.experimental.var;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.lang.reflect.Modifier;
 import java.util.stream.Stream;
 
@@ -18,7 +15,7 @@ import java.util.stream.Stream;
  * java 2 wasm exporter
  *
  * @author rapid
- * @version $Id: J2WExporter.java, v 0.1 2018Äê12ÔÂ15ÈÕ 8:12 PM rapid Exp $
+ * @version $Id: J2WExporter.java, v 0.1 2018ï¿½ï¿½12ï¿½ï¿½15ï¿½ï¿½ 8:12 PM rapid Exp $
  */
 public class J2WExporter {
     private StringBuilder sb = new StringBuilder();
@@ -53,7 +50,7 @@ public class J2WExporter {
     private void exportStatic(String namespace, Class clz) {
         sb.append("/// exported static: ").append(clz.getName()).append("\n");
         if (!Strings.isNullOrEmpty(namespace)) {
-            sb.append("declare namespace ").append(namespace).append(" {\n");
+            sb.append("export declare namespace ").append(namespace).append(" {\n");
         }
 
         Stream.of(clz.getMethods())
@@ -74,7 +71,7 @@ public class J2WExporter {
                 sb.append(")\n");
 
                 // declare begin
-                sb.append("  declare export function ").append(m.getName());
+                sb.append("  export function ").append(m.getName());
 
                 // parameters
                 sb.append('(');
@@ -83,7 +80,7 @@ public class J2WExporter {
                     sb.append('$').append(idx)
                         .append(": ").append(toTsType(parameterType))
                         .append(", ");
-                    idx ++;
+                    idx++;
                 }
                 sb.replace(sb.length() - 2, sb.length(), "): ");
                 sb.append(toTsType(m.getReturnType())).append(";\n\n");
