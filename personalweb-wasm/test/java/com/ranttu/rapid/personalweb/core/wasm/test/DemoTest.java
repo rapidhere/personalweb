@@ -16,7 +16,7 @@ public class DemoTest {
     @Test
     public void test0() {
         var compiler = new WebAssemblyCompiler();
-        var ins = DemoTest.class.getResourceAsStream("/test.wasm");
+        var ins = DemoTest.class.getResourceAsStream("/testres/demo.wasm");
 
         var res = compiler.compile(ins);
         System.out.println(res);
