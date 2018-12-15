@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 
 /**
  * @author rapid
- * @version $Id: Add.java, v 0.1 2018Äê12ÔÂ15ÈÕ 7:07 PM rapid Exp $
+ * @version $Id: Add.java, v 0.1 2018å¹´12æœˆ15æ—¥ 7:07 PM rapid Exp $
  */
 public class Add extends BaseWasmUnitTest {
     @Test

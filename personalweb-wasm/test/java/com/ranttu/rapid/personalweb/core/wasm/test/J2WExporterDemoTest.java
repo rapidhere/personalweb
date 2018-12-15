@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 
 /**
  * @author rapid
- * @version $Id: J2WExporterTest.java, v 0.1 2018Äê12ÔÂ15ÈÕ 8:59 PM rapid Exp $
+ * @version $Id: J2WExporterTest.java, v 0.1 2018å¹´12æœˆ15æ—¥ 8:59 PM rapid Exp $
  */
 public class J2WExporterDemoTest {
     @Test

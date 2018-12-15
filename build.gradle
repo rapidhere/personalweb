@@ -26,4 +26,43 @@ allprojects {
             resources.srcDirs = ['test/resources']
         }
     }
+
+    task j2wexport(type: J2WExportTask) {
+        enabled = false
+    }
+
+    j2wexport.dependsOn classes
+    build.dependsOn j2wexport
+}
+
+class J2WExportTask extends DefaultTask {
+    List<String> exports = []
+
+    @OutputFile
+    File dest
+
+    @TaskAction
+    void export() throws Exception {
+        try {
+            String buildDirPath = getProject().getBuildDir()
+            String classesPath = buildDirPath + "/classes/main"
+            URL[] urls = new URL[1]
+            urls[0] = new File(classesPath).absoluteFile.toURI().toURL()
+            ClassLoader buildCl = new URLClassLoader(urls, DefaultTask.class.getClassLoader())
+
+            def exporter = Class.forName("com.ranttu.rapid.personalweb.core.wasm.compile.export.J2WExporter", true, buildCl).newInstance()
+            exports.forEach({ clName ->
+                Class cl = Class.forName(clName, true, buildCl)
+
+                logger.info "exporting: " + cl.getName()
+                exporter.append(cl)
+            })
+
+            logger.info "export target: " + dest.absolutePath
+            dest.text = exporter.getTsString()
+        } catch (Exception e) {
+            logger.error("error: ", e)
+            throw new StopActionException("error during export j2w")
+        }
+    }
 }

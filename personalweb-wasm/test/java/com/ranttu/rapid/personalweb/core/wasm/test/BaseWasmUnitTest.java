@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 /**
  * @author rapid
- * @version $Id: BaseWasmUnitTest.java, v 0.1 2018Äê12ÔÂ15ÈÕ 7:05 PM rapid Exp $
+ * @version $Id: BaseWasmUnitTest.java, v 0.1 2018å¹´12æœˆ15æ—¥ 7:05 PM rapid Exp $
  */
 abstract public class BaseWasmUnitTest {
     private static ThreadLocal<Object> modules = new ThreadLocal<>();

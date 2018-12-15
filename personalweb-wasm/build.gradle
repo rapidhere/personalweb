@@ -11,6 +11,7 @@ sourceCompatibility = 1.8
 
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.16.20'
+    testCompileOnly 'org.projectlombok:lombok:1.16.20'
     apt "org.projectlombok:lombok:1.16.20"
 }
 
@@ -18,40 +19,9 @@ test {
     useTestNG()
 }
 
-class J2WExportTask extends DefaultTask {
-    List<String> exports = []
-
-    @OutputFile
-    File dest
-
-    @TaskAction
-    void export() throws Exception {
-        try {
-            String buildDirPath = getProject().getBuildDir()
-            String classesPath = buildDirPath + "/classes/main"
-            URL[] urls = new URL[1]
-            urls[0] = new File(classesPath).absoluteFile.toURI().toURL()
-            ClassLoader buildCl = new URLClassLoader(urls, DefaultTask.class.getClassLoader())
-
-            def exporter = Class.forName("com.ranttu.rapid.personalweb.core.wasm.compile.export.J2WExporter", true, buildCl).newInstance()
-            exports.forEach({ clName ->
-                Class cl = Class.forName(clName, true, buildCl)
-
-                println "exporting: " + cl.getName()
-                exporter.append(cl)
-            })
-
-            println "target path: " + dest.absolutePath
-            dest.text = exporter.getTsString()
-        } catch (Exception e) {
-            logger.error("error: ", e)
-            throw new StopActionException("error during export j2w")
-        }
-    }
-}
-
-task j2wexport(type: J2WExportTask) {
-    dest = project.getRootProject().file('assembly/lib/std.ts')
+j2wexport {
+    enabled = true
+    dest = rootProject.file('assembly/lib/std.ts')
 
     exports = [
             'com.ranttu.rapid.personalweb.core.wasm.std.MathSupports'

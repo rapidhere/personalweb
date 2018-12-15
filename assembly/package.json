@@ -1,3 +1,9 @@
 {
-  "name": "personal assembly scripts"
+  "name": "personal-web-assembly-scripts",
+  "devDependencies": {
+    "assemblyscript": "AssemblyScript/assemblyscript"
+  },
+  "scripts": {
+    "build": "asc src/index.ts -b output/index.wasm -t output/index.wast --debug --noLib"
+  }
 }
