@@ -8,7 +8,7 @@ import com.ranttu.rapid.personalweb.core.wasm.constants.ErrorCodes;
 
 /**
  * @author rapid
- * @version $Id: ShouldNotReach.java, v 0.1 2018Äê12ÔÂ14ÈÕ 12:52 AM rapid Exp $
+ * @version $Id: ShouldNotReach.java, v 0.1 2018-12-14- 12:52 AM rapid Exp $
  */
 public class ShouldNotReach extends WasmException {
     public ShouldNotReach() {

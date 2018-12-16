@@ -9,7 +9,7 @@ import lombok.Setter;
 
 /**
  * @author rapid
- * @version $Id: ImportItem.java, v 0.1 2018Äê12ÔÂ08ÈÕ 5:48 PM rapid Exp $
+ * @version $Id: ImportItem.java, v 0.1 2018-12-08- 5:48 PM rapid Exp $
  */
 public class ImportItem {
     @Getter

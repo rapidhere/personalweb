@@ -14,7 +14,7 @@ import java.io.PrintWriter;
  * common utilities
  *
  * @author rapid
- * @version $Id: $.java, v 0.1 2018Äê12ÔÂ07ÈÕ 4:41 PM rapid Exp $
+ * @version $Id: $.java, v 0.1 2018-12-07- 4:41 PM rapid Exp $
  */
 @UtilityClass
 public class $ {

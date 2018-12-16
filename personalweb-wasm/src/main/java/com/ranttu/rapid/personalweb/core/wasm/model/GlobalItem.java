@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * @author rapid
- * @version $Id: GlobalItem.java, v 0.1 2018Äê12ÔÂ08ÈÕ 7:49 PM rapid Exp $
+ * @version $Id: GlobalItem.java, v 0.1 2018-12-08- 7:49 PM rapid Exp $
  */
 @RequiredArgsConstructor
 public class GlobalItem {

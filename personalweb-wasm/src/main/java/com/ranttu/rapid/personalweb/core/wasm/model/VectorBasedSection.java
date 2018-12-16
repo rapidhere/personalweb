@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 
 /**
  * @author rapid
- * @version $Id: WasmVectorBasedSection.java, v 0.1 2018Äê12ÔÂ08ÈÕ 5:51 PM rapid Exp $
+ * @version $Id: WasmVectorBasedSection.java, v 0.1 2018-12-08- 5:51 PM rapid Exp $
  */
 public class VectorBasedSection<T> extends Section {
     /**

@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 
 /**
  * @author rapid
- * @version $Id: ExportItem.java, v 0.1 2018Äê12ÔÂ15ÈÕ 8:17 PM rapid Exp $
+ * @version $Id: ExportItem.java, v 0.1 2018-12-15- 8:17 PM rapid Exp $
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

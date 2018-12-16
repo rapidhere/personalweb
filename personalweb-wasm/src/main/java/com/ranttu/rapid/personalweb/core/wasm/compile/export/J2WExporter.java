@@ -15,7 +15,7 @@ import java.util.stream.Stream;
  * java 2 wasm exporter
  *
  * @author rapid
- * @version $Id: J2WExporter.java, v 0.1 2018��12��15�� 8:12 PM rapid Exp $
+ * @version $Id: J2WExporter.java, v 0.1 2018-12-15- 8:12 PM rapid Exp $
  */
 public class J2WExporter {
     private StringBuilder sb = new StringBuilder();
@@ -48,7 +48,7 @@ public class J2WExporter {
     }
 
     private void exportStatic(String namespace, Class clz) {
-        sb.append("/// exported static: ").append(clz.getName()).append("\n");
+        sb.append("//////////// exported static: ").append(clz.getName()).append("\n");
         if (!Strings.isNullOrEmpty(namespace)) {
             sb.append("export declare namespace ").append(namespace).append(" {\n");
         }
@@ -82,13 +82,19 @@ public class J2WExporter {
                         .append(", ");
                     idx++;
                 }
-                sb.replace(sb.length() - 2, sb.length(), "): ");
+                if (idx > 0) {
+                    sb.replace(sb.length() - 2, sb.length(), "): ");
+                } else {
+                    sb.append("): ");
+                }
                 sb.append(toTsType(m.getReturnType())).append(";\n\n");
             });
 
         if (!Strings.isNullOrEmpty(namespace)) {
             sb.append("}");
         }
+
+        sb.append("\n\n");
     }
 
     private String toTsType(Class clz) {
@@ -100,6 +106,8 @@ public class J2WExporter {
             return "f32";
         } else if (clz == double.class) {
             return "f64";
+        } else if (clz == void.class) {
+            return "void";
         } else {
             throw new WasmUnknownError("unknown ts type: " + clz.getName());
         }

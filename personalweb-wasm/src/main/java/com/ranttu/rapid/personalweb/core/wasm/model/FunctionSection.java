@@ -8,7 +8,7 @@ import com.ranttu.rapid.personalweb.core.wasm.constants.BinCodes;
 
 /**
  * @author rapid
- * @version $Id: FunctionSection.java, v 0.1 2018Äê12ÔÂ08ÈÕ 7:21 PM rapid Exp $
+ * @version $Id: FunctionSection.java, v 0.1 2018-12-08- 7:21 PM rapid Exp $
  */
 public class FunctionSection extends VectorBasedSection<Long> {
     public FunctionSection(Long[] items) {

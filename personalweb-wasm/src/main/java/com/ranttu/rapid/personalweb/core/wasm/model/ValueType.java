@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * @author rapid
- * @version $Id: ValueType.java, v 0.1 2018Äê12ÔÂ08ÈÕ 5:35 PM rapid Exp $
+ * @version $Id: ValueType.java, v 0.1 2018-12-08- 5:35 PM rapid Exp $
  */
 @RequiredArgsConstructor
 public class ValueType {

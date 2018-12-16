@@ -11,7 +11,7 @@ import static com.ranttu.rapid.personalweb.core.wasm.constants.BinCodes.TBL_ELEM
 
 /**
  * @author rapid
- * @version $Id: TableType.java, v 0.1 2018Äê12ÔÂ08ÈÕ 6:22 PM rapid Exp $
+ * @version $Id: TableType.java, v 0.1 2018-12-08- 6:22 PM rapid Exp $
  */
 @RequiredArgsConstructor
 public class TableType {

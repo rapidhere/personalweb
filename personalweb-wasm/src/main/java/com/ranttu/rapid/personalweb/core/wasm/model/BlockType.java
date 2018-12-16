@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * @author rapid
- * @version $Id: BlockType.java, v 0.1 2018Äê12ÔÂ09ÈÕ 12:26 PM rapid Exp $
+ * @version $Id: BlockType.java, v 0.1 2018-12-09- 12:26 PM rapid Exp $
  */
 @RequiredArgsConstructor
 public class BlockType {

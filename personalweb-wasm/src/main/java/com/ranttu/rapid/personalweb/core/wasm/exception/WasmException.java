@@ -10,7 +10,7 @@ import lombok.Getter;
  * base wasm exception
  *
  * @author rapid
- * @version $Id: WasmException.java, v 0.1 2018Äê12ÔÂ08ÈÕ 2:09 PM rapid Exp $
+ * @version $Id: WasmException.java, v 0.1 2018-12-08- 2:09 PM rapid Exp $
  */
 public class WasmException extends RuntimeException {
     /**

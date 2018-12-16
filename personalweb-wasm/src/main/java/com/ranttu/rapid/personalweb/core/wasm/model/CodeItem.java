@@ -9,7 +9,7 @@ import lombok.Getter;
 
 /**
  * @author rapid
- * @version $Id: CodeItem.java, v 0.1 2018Äê12ÔÂ09ÈÕ 4:13 PM rapid Exp $
+ * @version $Id: CodeItem.java, v 0.1 2018-12-09- 4:13 PM rapid Exp $
  */
 @Builder
 public class CodeItem {

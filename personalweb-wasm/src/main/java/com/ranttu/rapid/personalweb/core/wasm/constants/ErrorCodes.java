@@ -8,7 +8,7 @@ package com.ranttu.rapid.personalweb.core.wasm.constants;
  * error code constant
  *
  * @author rapid
- * @version $Id: ErrorCodes.java, v 0.1 2018Äê12ÔÂ08ÈÕ 2:12 PM rapid Exp $
+ * @version $Id: ErrorCodes.java, v 0.1 2018-12-08- 2:12 PM rapid Exp $
  */
 public interface ErrorCodes {
     //~~~ begin with 00, compiling error

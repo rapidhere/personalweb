@@ -18,7 +18,7 @@ import java.util.Queue;
  * the source input stream
  *
  * @author rapid
- * @version $Id: WasmSourceStream.java, v 0.1 2018Äê12ÔÂ08ÈÕ 1:58 PM rapid Exp $
+ * @version $Id: WasmSourceStream.java, v 0.1 2018-12-08- 1:58 PM rapid Exp $
  */
 @RequiredArgsConstructor(staticName = "of")
 class WasmSourceStream {

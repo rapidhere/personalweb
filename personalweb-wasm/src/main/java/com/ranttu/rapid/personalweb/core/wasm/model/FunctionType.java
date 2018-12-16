@@ -10,7 +10,7 @@ import lombok.Setter;
 
 /**
  * @author rapid
- * @version $Id: FunctionType.java, v 0.1 2018Äê12ÔÂ08ÈÕ 5:24 PM rapid Exp $
+ * @version $Id: FunctionType.java, v 0.1 2018-12-08- 5:24 PM rapid Exp $
  */
 public class FunctionType {
     @Getter

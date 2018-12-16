@@ -8,7 +8,7 @@ import com.ranttu.rapid.personalweb.core.wasm.constants.BinCodes;
 
 /**
  * @author rapid
- * @version $Id: ExportSection.java, v 0.1 2018Äê12ÔÂ09ÈÕ 4:01 PM rapid Exp $
+ * @version $Id: ExportSection.java, v 0.1 2018-12-09- 4:01 PM rapid Exp $
  */
 public class ExportSection extends VectorBasedSection<ExportItem> {
     public ExportSection(ExportItem[] items) {

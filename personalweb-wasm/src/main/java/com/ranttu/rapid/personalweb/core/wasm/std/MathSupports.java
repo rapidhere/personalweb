@@ -11,7 +11,7 @@ import com.ranttu.rapid.personalweb.core.wasm.compile.export.J2WExport;
  * java language support
  *
  * @author rapid
- * @version $Id: JavaLang.java, v 0.1 2018Äê12ÔÂ15ÈÕ 8:13 PM rapid Exp $
+ * @version $Id: JavaLang.java, v 0.1 2018-12-15 8:13 PM rapid Exp $
  */
 @J2WExport(exportStatic = true, namespace = "Math")
 final public class MathSupports {

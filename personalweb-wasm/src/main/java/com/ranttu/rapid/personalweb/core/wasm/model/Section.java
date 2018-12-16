@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * a wasm section
  * @author rapid
- * @version $Id: WasmSection.java, v 0.1 2018Äê12ÔÂ08ÈÕ 3:50 PM rapid Exp $
+ * @version $Id: WasmSection.java, v 0.1 2018-12-08 3:50 PM rapid Exp $
  */
 @RequiredArgsConstructor
 abstract public class Section {

@@ -9,7 +9,7 @@ import lombok.Getter;
 
 /**
  * @author rapid
- * @version $Id: WasmInstruction.java, v 0.1 2018Äê12ÔÂ08ÈÕ 10:13 PM rapid Exp $
+ * @version $Id: WasmInstruction.java, v 0.1 2018-12-08- 10:13 PM rapid Exp $
  */
 @Builder
 public class Instruction {

@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 /**
  * @author rapid
- * @version $Id: BaseWasmUnitTest.java, v 0.1 2018年12月15日 7:05 PM rapid Exp $
+ * @version $Id: BaseWasmUnitTest.java, v 0.1 2018-12-15 7:05 PM rapid Exp $
  */
 abstract public class BaseWasmUnitTest {
     private static ThreadLocal<Object> modules = new ThreadLocal<>();

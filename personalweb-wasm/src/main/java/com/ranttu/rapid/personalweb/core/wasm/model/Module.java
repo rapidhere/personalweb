@@ -11,7 +11,7 @@ import lombok.Getter;
  * a web assembly model
  *
  * @author rapid
- * @version $Id: WasmModule.java, v 0.1 2018Äê12ÔÂ07ÈÕ 5:04 PM rapid Exp $
+ * @version $Id: WasmModule.java, v 0.1 2018-12-07- 5:04 PM rapid Exp $
  */
 @Getter
 @Builder

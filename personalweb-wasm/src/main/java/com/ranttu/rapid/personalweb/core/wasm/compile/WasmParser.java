@@ -22,7 +22,7 @@ import static com.ranttu.rapid.personalweb.core.wasm.constants.BinCodes.*;
  * parse source bytes to a structured wasm module
  *
  * @author rapid
- * @version $Id: WasmParser.java, v 0.1 2018Äê12ÔÂ10ÈÕ 4:34 PM rapid Exp $
+ * @version $Id: WasmParser.java, v 0.1 2018-12-10 4:34 PM rapid Exp $
  */
 public class WasmParser {
     /**

@@ -8,7 +8,7 @@ package com.ranttu.rapid.personalweb.core.wasm.constants;
  * binary codes constants for wasm
  *
  * @author rapid
- * @version $Id: BinCodes.java, v 0.1 2018Äê12ÔÂ08ÈÕ 2:30 PM rapid Exp $
+ * @version $Id: BinCodes.java, v 0.1 2018-12-08 2:30 PM rapid Exp $
  */
 public interface BinCodes {
     //~~~ magic number

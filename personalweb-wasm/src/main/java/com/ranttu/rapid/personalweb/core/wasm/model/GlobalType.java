@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * @author rapid
- * @version $Id: GlobalType.java, v 0.1 2018Äê12ÔÂ08ÈÕ 7:15 PM rapid Exp $
+ * @version $Id: GlobalType.java, v 0.1 2018-12-08- 7:15 PM rapid Exp $
  */
 @RequiredArgsConstructor
 public class GlobalType {

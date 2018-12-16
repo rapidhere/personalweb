@@ -24,6 +24,7 @@ j2wexport {
     dest = rootProject.file('assembly/lib/std.ts')
 
     exports = [
-            'com.ranttu.rapid.personalweb.core.wasm.std.MathSupports'
+            'com.ranttu.rapid.personalweb.core.wasm.std.MathSupports',
+            'com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports'
     ]
 }

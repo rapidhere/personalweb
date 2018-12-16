@@ -1,5 +1,5 @@
-import { Math } from '../lib/std';
+import { Math, rt } from '../lib/std';
 
-export function addAndSqrt(a: f64, b: f64): f64 {
-    return Math.sqrt(a + b);
+export function random(a: i64): i64 {
+    return rt.currentTimeMillis() + a;
 }

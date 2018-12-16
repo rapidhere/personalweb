@@ -8,7 +8,7 @@ import com.ranttu.rapid.personalweb.core.wasm.constants.ErrorCodes;
 
 /**
  * @author rapid
- * @version $Id: WasmUnknownError.java, v 0.1 2018Äê12ÔÂ08ÈÕ 2:14 PM rapid Exp $
+ * @version $Id: WasmUnknownError.java, v 0.1 2018-12-08- 2:14 PM rapid Exp $
  */
 public class WasmUnknownError extends WasmException {
     public WasmUnknownError(String msg) {

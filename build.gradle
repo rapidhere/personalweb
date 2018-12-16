@@ -32,6 +32,7 @@ allprojects {
     }
 
     j2wexport.dependsOn classes
+    j2wexport.outputs.upToDateWhen { false }
     build.dependsOn j2wexport
 }
 

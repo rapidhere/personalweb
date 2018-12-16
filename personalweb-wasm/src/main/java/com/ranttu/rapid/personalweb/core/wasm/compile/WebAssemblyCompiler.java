@@ -27,7 +27,7 @@ import static com.ranttu.rapid.personalweb.core.wasm.misc.asm.Type.getInternalNa
  * only compile a simple module
  *
  * @author rapid
- * @version $Id: WebAssemblyCompiler.java, v 0.1 2018Äê12ÔÂ07ÈÕ 5:00 PM rapid Exp $
+ * @version $Id: WebAssemblyCompiler.java, v 0.1 2018-12-07 5:00 PM rapid Exp $
  */
 public class WebAssemblyCompiler {
     /**

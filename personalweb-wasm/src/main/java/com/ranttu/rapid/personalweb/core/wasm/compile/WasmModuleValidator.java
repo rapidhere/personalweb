@@ -10,7 +10,7 @@ import com.ranttu.rapid.personalweb.core.wasm.model.Module;
  * validate the module
  *
  * @author rapid
- * @version $Id: WasmModuleValidator.java, v 0.1 2018Äê12ÔÂ10ÈÕ 4:38 PM rapid Exp $
+ * @version $Id: WasmModuleValidator.java, v 0.1 2018-12-10- 4:38 PM rapid Exp $
  */
 public class WasmModuleValidator {
     /**
