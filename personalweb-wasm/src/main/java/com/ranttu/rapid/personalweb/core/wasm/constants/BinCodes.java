@@ -77,6 +77,7 @@ public interface BinCodes {
     byte OP_DROP = 0x1A;
     byte OP_SELECT = 0x1B;
     byte OP_I32ADD = 0x6A;
+    byte OP_I64ADD = 0x7C;
 
 
     byte BLK_END = 0x0B;

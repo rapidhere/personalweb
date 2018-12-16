@@ -32,4 +32,6 @@ public class Module {
     private final GlobalSection globalSection;
     private final ExportSection exportSection;
     private final CodeSection codeSection;
+    private final StartSection startSection;
+    private final ElementSection elementSection;
 }

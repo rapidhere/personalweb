@@ -110,7 +110,11 @@ public class WasmParser {
                 moduleBuilder.codeSection(parseCodeSection(readSection(ins)));
                 break;
             case SCT_START:
+                moduleBuilder.startSection(parseStartSection(readSection(ins)));
+                break;
             case SCT_ELEMENT:
+                moduleBuilder.elementSection(parseElementSection(readSection(ins)));
+                break;
             case SCT_DATA:
             default:
                 throw new WasmCompilingException(ErrorCodes.UNKNOWN_SECTION, "unknown section: " + sectionId);
@@ -123,6 +127,32 @@ public class WasmParser {
     private WasmSourceStream readSection(WasmSourceStream ins) {
         var len = ins.nextUInt();
         return ins.asSubStream(len);
+    }
+
+    private StartSection parseStartSection(WasmSourceStream secIns) {
+        return new StartSection(secIns.nextUInt());
+    }
+
+    private ElementSection parseElementSection(WasmSourceStream secIns) {
+        var cnt = secIns.nextUInt();
+        var elems = new ElementItem[(int) cnt];
+
+        for (int i = 0; i < cnt; i++) {
+            var eleBuilder = ElementItem.builder();
+            eleBuilder.tableIndex(secIns.nextUInt());
+            eleBuilder.instructions(readInstructions(secIns));
+
+            var funcIndexCnt = secIns.nextUInt();
+            var funcIndexes = new long[(int) funcIndexCnt];
+            for (int j = 0; j < funcIndexCnt; j++) {
+                funcIndexes[j] = secIns.nextUInt();
+            }
+            eleBuilder.funcIndexes(funcIndexes);
+
+            elems[i] = eleBuilder.build();
+        }
+
+        return new ElementSection(elems);
     }
 
     private TypeSection parseTypeSection(WasmSourceStream secIns) {
@@ -292,7 +322,8 @@ public class WasmParser {
             case OP_UNREACHABLE:
             case OP_NOP:
             case OP_RETURN:
-            case OP_I32ADD: {
+            case OP_I32ADD:
+            case OP_I64ADD: {
                 return instBuilder.build();
             }
             //~~~ blocked instruction

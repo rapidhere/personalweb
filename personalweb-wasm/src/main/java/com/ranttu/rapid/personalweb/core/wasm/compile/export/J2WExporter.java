@@ -63,12 +63,17 @@ public class J2WExporter {
 
                 // meta info
                 // class meta info
-                sb.append("  @java_class(\"").append(clz.getName()).append("\")\n");
+                sb.append("  /**\n");
+                sb.append("   * @java_class  ").append(clz.getName()).append("\n");
                 // method meta info
-                sb.append("  @java_method(\"").append(m.getName()).append("\"");
+                sb.append("   * @java_method ").append(m.getName());
                 Stream.of(m.getParameterTypes())
-                    .forEach(t -> sb.append(", \"").append(t.getName()).append("\""));
-                sb.append(")\n");
+                    .forEach(t -> sb.append(" ").append(t.getName()));
+                sb.append("\n");
+                sb.append("   */\n");
+                // external meta info
+                sb.append("  @external(\"").append(clz.getName()).append("\", ")
+                    .append("\"").append(m.getName()).append("\")\n");
 
                 // declare begin
                 sb.append("  export function ").append(m.getName());
