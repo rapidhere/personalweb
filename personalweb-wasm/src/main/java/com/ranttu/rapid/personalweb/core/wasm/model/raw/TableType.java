@@ -2,8 +2,9 @@
  * Alipay.com Inc.
  * Copyright (c) 2004-2018 All Rights Reserved.
  */
-package com.ranttu.rapid.personalweb.core.wasm.model;
+package com.ranttu.rapid.personalweb.core.wasm.model.raw;
 
+import com.ranttu.rapid.personalweb.core.wasm.model.raw.LimitInfo;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

@@ -9,7 +9,8 @@ import com.ranttu.rapid.personalweb.core.wasm.constants.ErrorCodes;
 import com.ranttu.rapid.personalweb.core.wasm.exception.WasmCompilingException;
 import com.ranttu.rapid.personalweb.core.wasm.exception.WasmException;
 import com.ranttu.rapid.personalweb.core.wasm.exception.WasmUnknownError;
-import com.ranttu.rapid.personalweb.core.wasm.model.*;
+import com.ranttu.rapid.personalweb.core.wasm.model.Module;
+import com.ranttu.rapid.personalweb.core.wasm.model.raw.*;
 import lombok.experimental.var;
 
 import java.io.InputStream;
@@ -33,7 +34,9 @@ public class WasmParser {
 
         doParse(builder, inputStream);
 
-        return builder.build();
+        var module = builder.build();
+        ModuleComposer.compose(module);
+        return module;
     }
 
     /**

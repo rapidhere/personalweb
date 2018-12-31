@@ -70,9 +70,13 @@ public class J2WExporter {
                 Stream.of(m.getParameterTypes())
                     .forEach(t -> sb.append(" ").append(t.getName()));
                 sb.append("\n");
+                // invoke type meta info
+                sb.append("   * @java_invoke static\n");
                 sb.append("   */\n");
+
                 // external meta info
-                sb.append("  @external(\"").append(clz.getName()).append("\", ")
+                sb.append("  @external(\"")
+                    .append(clz.getName()).append("\", ")
                     .append("\"").append(m.getName()).append("\")\n");
 
                 // declare begin

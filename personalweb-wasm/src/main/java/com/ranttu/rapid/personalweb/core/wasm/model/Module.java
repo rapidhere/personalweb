@@ -4,8 +4,12 @@
  */
 package com.ranttu.rapid.personalweb.core.wasm.model;
 
+import com.ranttu.rapid.personalweb.core.wasm.model.raw.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
 
 /**
  * a web assembly model
@@ -23,7 +27,7 @@ public class Module {
 
     private final byte version;
 
-    //~~~ sections
+    //~~~ raw info sections
     private final TypeSection typeSection;
     private final ImportSection importSection;
     private final FunctionSection functionSection;
@@ -34,4 +38,15 @@ public class Module {
     private final CodeSection codeSection;
     private final StartSection startSection;
     private final ElementSection elementSection;
+
+    //~~~ higher level model
+    @Setter
+    private List<FunctionElement> functions;
+
+    public FunctionElement getFunction(int idx) {
+        return functions.stream()
+            .filter(functionElement -> functionElement.getIndex() == idx)
+            .findFirst()
+            .orElse(null);
+    }
 }

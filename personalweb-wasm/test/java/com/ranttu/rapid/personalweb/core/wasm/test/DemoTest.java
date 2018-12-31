@@ -13,12 +13,14 @@ import org.testng.annotations.Test;
  * @version $Id: DemoTest.java, v 0.1 2018-12-09 2:12 PM rapid Exp $
  */
 public class DemoTest {
+    private int c;
+
     @Test
     public void test0() {
-        var compiler = new WebAssemblyCompiler();
-        var ins = DemoTest.class.getResourceAsStream("/testres/demo.wasm");
+        var stream = getClass()
+            .getResourceAsStream("/testres/demo2.wasm");
+        var module = new WebAssemblyCompiler().compile(stream);
 
-        var res = compiler.compile(ins);
-        System.out.println(res);
+        System.out.println(module);
     }
 }
