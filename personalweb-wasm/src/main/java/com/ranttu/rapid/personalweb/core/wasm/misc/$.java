@@ -7,9 +7,12 @@ package com.ranttu.rapid.personalweb.core.wasm.misc;
 import com.ranttu.rapid.personalweb.core.wasm.exception.ShouldNotReach;
 import com.ranttu.rapid.personalweb.core.wasm.misc.asm.ClassReader;
 import com.ranttu.rapid.personalweb.core.wasm.misc.asm.util.TraceClassVisitor;
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
+import sun.misc.Unsafe;
 
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 
 /**
  * common utilities
@@ -19,6 +22,8 @@ import java.io.PrintWriter;
  */
 @UtilityClass
 public class $ {
+    private final Unsafe unsafe = initUnsafe();
+
     /**
      * print the class from byte code
      *
@@ -35,8 +40,32 @@ public class $ {
     }
 
     public <T> T should(boolean condition) {
-        if (! condition) {
+        if (!condition) {
             throw new ShouldNotReach();
+        }
+
+        return null;
+    }
+
+    public Unsafe unsafe() {
+        return unsafe;
+    }
+
+    @SneakyThrows
+    private Unsafe initUnsafe() {
+        Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
+        Field theUnsafe = null;
+        Field[] fields = unsafeClass.getDeclaredFields();
+
+        for (Field field : fields) {
+            if (field.getName().equals("theUnsafe")) {
+                theUnsafe = field;
+            }
+        }
+
+        if (theUnsafe != null) {
+            theUnsafe.setAccessible(true);
+            return (Unsafe) theUnsafe.get(null);
         }
 
         return null;

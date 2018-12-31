@@ -14,4 +14,8 @@ import java.lang.annotation.*;
 @Documented
 @Target({ElementType.METHOD, ElementType.FIELD})
 public @interface Export {
+    /**
+     * just a marker
+     */
+    boolean buildIn() default false;
 }

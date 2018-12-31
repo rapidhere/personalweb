@@ -8,6 +8,7 @@ import com.google.common.base.Strings;
 import com.ranttu.rapid.personalweb.core.wasm.exception.WasmUnknownError;
 import lombok.experimental.var;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.stream.Stream;
 
@@ -36,6 +37,8 @@ public class J2WExporter {
 
         if (isStaticExport) {
             exportStatic(namespace, clz);
+        } else {
+            exportClass(j2WExport.typeAlias(), clz);
         }
     }
 
@@ -45,6 +48,31 @@ public class J2WExporter {
 
     public String getTsString() {
         return sb.toString();
+    }
+
+    private void exportClass(String alias, Class clz) {
+        sb.append("//////////// exported class: ").append(clz.getName()).append("\n");
+        sb.append("export declare class ").append(clz.getName().replace('.', '_')).append(" {\n");
+
+        Stream.of(clz.getMethods())
+            .filter(m -> m.isAnnotationPresent(Export.class))
+            .forEach(m -> {
+                // meta info
+                appendMetaInfo(clz, m, "virtual", "  ");
+
+                sb.append("  ");
+                appendMethodSignature(m);
+                sb.append("\n\n");
+            });
+        sb.append("}\n");
+
+        //if (Strings.isNullOrEmpty(alias)) {
+        sb.append("\n");
+        //} else {
+        //    sb.append("/** class alias: ").append(clz.getName()).append(" -> ").append(alias).append(" */\n");
+        //    sb.append("export type ").append(alias).append(" = ").append(clz.getName().replace('.', '_'));
+        //    sb.append("\n\n");
+        //}
     }
 
     private void exportStatic(String namespace, Class clz) {
@@ -63,16 +91,7 @@ public class J2WExporter {
 
                 // meta info
                 // class meta info
-                sb.append("  /**\n");
-                sb.append("   * @java_class  ").append(clz.getName()).append("\n");
-                // method meta info
-                sb.append("   * @java_method ").append(m.getName());
-                Stream.of(m.getParameterTypes())
-                    .forEach(t -> sb.append(" ").append(t.getName()));
-                sb.append("\n");
-                // invoke type meta info
-                sb.append("   * @java_invoke static\n");
-                sb.append("   */\n");
+                appendMetaInfo(clz, m, "static", Strings.isNullOrEmpty(namespace) ? "" : "  ");
 
                 // external meta info
                 sb.append("  @external(\"")
@@ -80,23 +99,9 @@ public class J2WExporter {
                     .append("\"").append(m.getName()).append("\")\n");
 
                 // declare begin
-                sb.append("  export function ").append(m.getName());
-
-                // parameters
-                sb.append('(');
-                int idx = 0;
-                for (var parameterType : m.getParameterTypes()) {
-                    sb.append('$').append(idx)
-                        .append(": ").append(toTsType(parameterType))
-                        .append(", ");
-                    idx++;
-                }
-                if (idx > 0) {
-                    sb.replace(sb.length() - 2, sb.length(), "): ");
-                } else {
-                    sb.append("): ");
-                }
-                sb.append(toTsType(m.getReturnType())).append(";\n\n");
+                sb.append("  export function ");
+                appendMethodSignature(m);
+                sb.append("\n\n");
             });
 
         if (!Strings.isNullOrEmpty(namespace)) {
@@ -104,6 +109,40 @@ public class J2WExporter {
         }
 
         sb.append("\n\n");
+    }
+
+    private void appendMetaInfo(Class clz, Method m, String invokeType, String indent) {
+        sb.append(indent).append("/**\n");
+        sb.append(indent).append(" * @java_class  ").append(clz.getName()).append("\n");
+        // method meta info
+        sb.append(indent).append(" * @java_method ").append(m.getName());
+        Stream.of(m.getParameterTypes())
+            .forEach(t -> sb.append(" ").append(t.getName()));
+        sb.append(indent).append("\n");
+        // invoke type meta info
+        sb.append(indent).append(" * @java_invoke ").append(invokeType).append("\n");
+        sb.append(indent).append(" */\n");
+    }
+
+    private void appendMethodSignature(Method m) {
+
+        sb.append(m.getName());
+
+        // parameters
+        sb.append('(');
+        int idx = 0;
+        for (var parameterType : m.getParameterTypes()) {
+            sb.append('$').append(idx)
+                .append(": ").append(toTsType(parameterType))
+                .append(", ");
+            idx++;
+        }
+        if (idx > 0) {
+            sb.replace(sb.length() - 2, sb.length(), "): ");
+        } else {
+            sb.append("): ");
+        }
+        sb.append(toTsType(m.getReturnType())).append(";");
     }
 
     private String toTsType(Class clz) {
@@ -117,6 +156,14 @@ public class J2WExporter {
             return "f64";
         } else if (clz == void.class) {
             return "void";
+        } else if (clz == String.class) {
+            return "string";
+        } else if (clz.isAnnotationPresent(J2WExport.class)) {
+            J2WExport j2WExport = (J2WExport) clz.getAnnotation(J2WExport.class);
+            if (j2WExport.exportStatic()) {
+                throw new WasmUnknownError("unknown ts type: " + clz.getName());
+            }
+            return clz.getName().replace('.', '_');
         } else {
             throw new WasmUnknownError("unknown ts type: " + clz.getName());
         }

@@ -10,8 +10,10 @@ import com.ranttu.rapid.personalweb.core.wasm.model.*;
 import com.ranttu.rapid.personalweb.core.wasm.model.raw.CodeItem;
 import com.ranttu.rapid.personalweb.core.wasm.model.raw.Instruction;
 import com.ranttu.rapid.personalweb.core.wasm.model.raw.ValueType;
+import lombok.SneakyThrows;
 import lombok.experimental.var;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
@@ -42,24 +44,37 @@ public class ModuleComposer {
         }
 
         module.getImportSection().stream().forEach(importItem -> {
-            ExposableElement ele = null;
             if (importItem.getImportType() == BinCodes.IMP_FUNCTION) {
-                ele = composeFunction(
+                FunctionElement func = composeFunction(
                     module,
                     (int) importItem.getTypeIdx(),
                     -1,
                     importItem.getName()
                 );
-                module.getFunctions().add((FunctionElement) ele);
+                func.setImported(true);
+                func.setImportModule(importItem.getModule());
+
+                if (func.isStaticImport()) {
+                    func.setDelegateMethod(findDelegateMethod(importItem.getModule(), importItem.getName()));
+                } else if (func.isClassImport()) {
+                    String[] tmp = importItem.getName().split("#");
+                    func.setDelegateMethod(findDelegateMethod(tmp[0].replace('_', '.'), tmp[1]));
+                } else {
+                    throw new ShouldNotReach();
+                }
+
+                module.getFunctions().add(func);
             }
             // TODO: others are ignored
-
-            if (ele != null) {
-                ele.setImported(true);
-                ele.setName(importItem.getName());
-                ele.setImportModule(importItem.getModule());
-            }
         });
+    }
+
+    @SneakyThrows
+    private Method findDelegateMethod(String module, String methodName) {
+        return Stream.of(Class.forName(module).getMethods())
+            .filter(m -> m.getName().equals(methodName))
+            .findFirst()
+            .orElse(null);
     }
 
     private void composeExports(Module module) {

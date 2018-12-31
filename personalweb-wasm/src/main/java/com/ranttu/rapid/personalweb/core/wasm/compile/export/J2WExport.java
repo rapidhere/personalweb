@@ -16,7 +16,9 @@ import java.lang.annotation.*;
 public @interface J2WExport {
     boolean exportStatic() default false;
 
-    String packageName() default "";
-
+    // for static export only
     String namespace() default "";
+
+    // for class export only
+    String typeAlias() default "";
 }

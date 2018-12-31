@@ -19,7 +19,7 @@ public class DemoTest {
     public void test0() {
         var stream = getClass()
             .getResourceAsStream("/testres/demo2.wasm");
-        var module = new WebAssemblyCompiler().compile(stream);
+        var module = new WebAssemblyCompiler().compile(stream, "demo.wasm");
 
         System.out.println(module);
     }

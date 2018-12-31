@@ -9,12 +9,13 @@ import com.ranttu.rapid.personalweb.core.wasm.constants.ErrorCodes;
 import com.ranttu.rapid.personalweb.core.wasm.exception.ShouldNotReach;
 import com.ranttu.rapid.personalweb.core.wasm.exception.WasmCompilingException;
 import com.ranttu.rapid.personalweb.core.wasm.misc.$;
-import com.ranttu.rapid.personalweb.core.wasm.misc.AsmHelper;
 import com.ranttu.rapid.personalweb.core.wasm.misc.asm.ClassWriter;
+import com.ranttu.rapid.personalweb.core.wasm.misc.asm.Type;
 import com.ranttu.rapid.personalweb.core.wasm.misc.asm.tree.MethodNode;
-import com.ranttu.rapid.personalweb.core.wasm.misc.asm.tree.VarInsnNode;
 import com.ranttu.rapid.personalweb.core.wasm.model.*;
-import com.ranttu.rapid.personalweb.core.wasm.model.runtime.WasmModule;
+import com.ranttu.rapid.personalweb.core.wasm.rt.Runtimes;
+import com.ranttu.rapid.personalweb.core.wasm.rt.WasmModule;
+import com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports;
 import lombok.experimental.var;
 
 import java.io.InputStream;
@@ -32,6 +33,8 @@ import static com.ranttu.rapid.personalweb.core.wasm.misc.asm.Type.getInternalNa
  * @version $Id: WebAssemblyCompiler.java, v 0.1 2018-12-07 5:00 PM rapid Exp $
  */
 public class WebAssemblyCompiler {
+    private static final short COMPILER_VERSION = 1;
+
     /**
      * module parser
      */
@@ -52,13 +55,16 @@ public class WebAssemblyCompiler {
      */
     private final AtomicInteger classCounter = new AtomicInteger(0);
 
+    /**
+     * compiling context holder
+     */
     private final ThreadLocal<CompilingContext> CTX_HOLDER = new ThreadLocal<>();
 
     /**
      * get the compiled wasm module
      * NOTE: compiler will close the stream
      */
-    public WasmModule compile(InputStream inputStream) {
+    public WasmModule compile(InputStream inputStream, String sourceName) {
         // parse source
         var module = wasmParser.parseModule(inputStream);
 
@@ -66,14 +72,15 @@ public class WebAssemblyCompiler {
         wasmValidator.validateModule(module);
 
         // compile
-        return doCompile(module);
+        return doCompile(module, sourceName);
     }
 
-    private WasmModule doCompile(Module module) {
+    private WasmModule doCompile(Module module, String sourceName) {
         var ctx = new CompilingContext();
         CTX_HOLDER.set(ctx);
         ctx.className = genClzName();
         ctx.module = module;
+        ctx.sourceName = sourceName;
 
         var bytes = assembleModuleClass();
         $.printClass(ctx.className, bytes);
@@ -105,14 +112,45 @@ public class WebAssemblyCompiler {
             null,
             getInternalName(WasmModule.class),
             new String[0]);
-        cw.visitSource("<wasm>", null);
+        cw.visitSource("<wasm>: " + ctx().sourceName, null);
 
+        assembleMetas(cw);
         assembleConstructor(cw);
         assembleFunctionImports(cw);
         assembleFunctions(cw);
 
         cw.visitEnd();
         return cw.toByteArray();
+    }
+
+    private void assembleMetas(ClassWriter cw) {
+        //~~~ getSourceName
+        var mv = cw.visitMethod(
+            ACC_PUBLIC,
+            "getSourceName",
+            "()Ljava/lang/String;",
+            null,
+            new String[0]
+        );
+        mv.visitCode();
+        mv.visitLdcInsn(ctx().sourceName);
+        mv.visitInsn(ARETURN);
+        mv.visitMaxs(0, 0);
+        mv.visitEnd();
+
+        //~~~ getMetaVersion
+        mv = cw.visitMethod(
+            ACC_PUBLIC,
+            "getMetaVersion",
+            "()Ljava/lang/String;",
+            null,
+            new String[0]
+        );
+        mv.visitCode();
+        mv.visitLdcInsn(String.format("W%02xC%02x", COMPILER_VERSION, ctx().module.getVersion()));
+        mv.visitInsn(ARETURN);
+        mv.visitMaxs(0, 0);
+        mv.visitEnd();
     }
 
     private void assembleConstructor(ClassWriter cw) {
@@ -143,41 +181,133 @@ public class WebAssemblyCompiler {
                 ctx().shouldEvalTypeClear();
 
                 var mv = new MethodNode(
-                    ACC_PRIVATE,
+                    ACC_PRIVATE + ACC_STATIC,
                     func.getDeclarationName(),
-                    func.getDesc(),
+                    func.getDeclarationMethodDesc(ctx().internalClassName),
                     null,
                     new String[0]
                 );
-
                 // visit codes
                 mv.visitCode();
 
                 if (func.isStaticImport()) {
-                    // push parameters
-                    for (int idx = 0; idx < func.getParameterSize(); idx++) {
-                        var parType = func.getParameterTypes().get(idx);
-                        assembleLocalGet(mv, func, idx, parType);
+                    if (func.isBuiltin()) {
+                        assembleBuiltins(mv, func);
+                    } else {
+                        assembleStaticImport(mv, func);
                     }
-
-                    // call function
-                    mv.visitMethodInsn(
-                        INVOKESTATIC,
-                        func.getStaticImportClassInternalName(),
-                        func.getName(),
-                        func.getDesc(),
-                        false
-                    );
-
-                    // assemble return
-                    ctx().evalPop(func.getParameterSize());
-                    ctx().evalPush(func.getResultType());
-                    assembleReturn(mv);
+                } else if (func.isClassImport()) {
+                    assembleClassImport(mv, func);
                 }
-                // TODO: support other imports
 
+                // TODO: support other imports
                 mv.accept(cw);
             });
+    }
+
+    private void assembleClassImport(MethodNode mv, FunctionElement func) {
+        // get java object on stack
+        assembleLocalAccess(mv, func, 0, TypeElement.I32_TYPE, true, false);
+        assembleObtainObject(
+            mv,
+            getInternalName(func.getDelegateMethod().getDeclaringClass()));
+
+        // push parameters
+        for (int idx = 1; idx < func.getParameterSize(); idx++) {
+            var parType = func.getParameterTypes().get(idx);
+            assembleLocalAccess(mv, func, idx, parType, true, false);
+            checkAndCast(
+                mv,
+                ctx().currentType(),
+                getInternalName(func.getDelegateMethod().getParameterTypes()[idx - 1])
+            );
+        }
+
+        // call
+        mv.visitMethodInsn(
+            INVOKEVIRTUAL,
+            func.getJavaClassInternalName(),
+            func.getDelegateMethod().getName(),
+            Type.getMethodDescriptor(func.getDelegateMethod()),
+            func.getDelegateMethod().getDeclaringClass().isInterface()
+        );
+
+        // assemble return
+        ctx().evalPop(func.getParameterSize());
+        if (func.getResultType() != TypeElement.VOID_TYPE) {
+            ctx().evalPush(func.getResultType());
+        }
+        assembleReturn(mv, func);
+    }
+
+    private void assembleStaticImport(MethodNode mv, FunctionElement func) {
+        // push parameters
+        for (int idx = 0; idx < func.getParameterSize(); idx++) {
+            var parType = func.getParameterTypes().get(idx);
+            assembleLocalAccess(mv, func, idx, parType, true, false);
+            checkAndCast(
+                mv,
+                ctx().currentType(),
+                getInternalName(func.getDelegateMethod().getParameterTypes()[idx])
+            );
+        }
+
+        // call function
+        mv.visitMethodInsn(
+            INVOKESTATIC,
+            func.getJavaClassInternalName(),
+            func.getDelegateMethod().getName(),
+            Type.getMethodDescriptor(func.getDelegateMethod()),
+            false
+        );
+
+        // assemble return
+        ctx().evalPop(func.getParameterSize());
+        if (func.getResultType() != TypeElement.VOID_TYPE) {
+            ctx().evalPush(func.getResultType());
+        }
+        assembleReturn(mv, func);
+    }
+
+    private void checkAndCast(MethodNode mv, TypeElement currentType, String targetClassType) {
+        if (!currentType.getJavaTypeStr().equals(targetClassType)) {
+            assembleObtainObject(mv, targetClassType);
+        }
+    }
+
+    private void assembleObtainObject(MethodNode mv, String targetClassType) {
+        mv.visitMethodInsn(
+            INVOKESTATIC,
+            getInternalName(Runtimes.class),
+            "obtainObject",
+            "(I)Ljava/lang/Object;",
+            false
+        );
+        mv.visitTypeInsn(CHECKCAST, targetClassType);
+    }
+
+    private void assembleObjectIdentity(MethodNode mv) {
+        mv.visitMethodInsn(
+            INVOKESTATIC,
+            getInternalName(Runtimes.class),
+            "objectIdentity",
+            "(Ljava/lang/Object;)I",
+            false
+        );
+    }
+
+    private void assembleBuiltins(MethodNode mv, FunctionElement func) {
+        if (func.getImportModule().equals(SystemSupports.class.getName())) {
+            // ref builtin
+            if (func.getName().equals("ref")) {
+                mv.visitVarInsn(ALOAD, func.calculateThisOffset());
+                assembleObjectIdentity(mv);
+                mv.visitInsn(IRETURN);
+                return;
+            }
+        }
+
+        throw new ShouldNotReach();
     }
 
     private void assembleFunctions(ClassWriter cw) {
@@ -189,9 +319,9 @@ public class WebAssemblyCompiler {
                 ctx().shouldEvalTypeClear();
 
                 var mv = new MethodNode(
-                    func.isExported() ? ACC_PUBLIC : ACC_PRIVATE,
+                    (func.isExported() ? ACC_PUBLIC : ACC_PRIVATE) + ACC_STATIC,
                     func.getDeclarationName(),
-                    func.getDesc(),
+                    func.getDeclarationMethodDesc(ctx().internalClassName),
                     null,
                     new String[0]
                 );
@@ -202,7 +332,7 @@ public class WebAssemblyCompiler {
                     assembleInstruction(mv, instructionElement));
 
                 if (!ctx().isEvalTypeClear() || func.getResultType() == TypeElement.VOID_TYPE) {
-                    assembleReturn(mv);
+                    assembleReturn(mv, func);
                 }
 
                 mv.accept(cw);
@@ -212,10 +342,19 @@ public class WebAssemblyCompiler {
     private void assembleInstruction(MethodNode mv, InstructionElement instruction) {
         switch (instruction.getOpcode()) {
             case BinCodes.OP_LOCALGET: {
-                assembleLocalGet(mv,
+                assembleLocalAccess(mv,
                     instruction.getFunctionElement(),
                     instruction.getLocalIndex(),
-                    instruction.getLocalType());
+                    instruction.getLocalType(),
+                    true, false);
+                break;
+            }
+            case BinCodes.OP_LOCALTEE: {
+                assembleLocalAccess(mv,
+                    instruction.getFunctionElement(),
+                    instruction.getLocalIndex(),
+                    instruction.getLocalType(),
+                    true, true);
                 break;
             }
             case BinCodes.OP_I32ADD: {
@@ -231,7 +370,7 @@ public class WebAssemblyCompiler {
                 break;
             }
             case BinCodes.OP_CALL: {
-                assembleDirectCall(mv, instruction.getCallFunction());
+                assembleDirectCall(mv, instruction.getFunctionElement(), instruction.getCallFunction());
                 break;
             }
             case BinCodes.OP_NOP: {
@@ -244,63 +383,76 @@ public class WebAssemblyCompiler {
         }
     }
 
-    private void assembleDirectCall(MethodNode mv, FunctionElement func) {
-        AsmHelper.insertInsnAt(
-            mv,
-            mv.instructions.size() - func.getParameterSize() - 1,
-            new VarInsnNode(ALOAD, 0));
-
+    private void assembleDirectCall(MethodNode mv, FunctionElement caller, FunctionElement func) {
+        mv.visitVarInsn(ALOAD, caller.calculateThisOffset());
         mv.visitMethodInsn(
-            INVOKESPECIAL,
+            INVOKESTATIC,
             ctx().internalClassName,
             func.getDeclarationName(),
-            func.getDesc(),
+            func.getDeclarationMethodDesc(ctx().internalClassName),
             false
         );
 
         ctx().evalPop(func.getParameterSize());
-        ctx().evalPush(func.getResultType());
+        if (func.getResultType() != TypeElement.VOID_TYPE) {
+            ctx().evalPush(func.getResultType());
+        }
     }
 
-    private void assembleLocalGet(MethodNode mv, FunctionElement func, int localIdx, TypeElement type) {
-        ctx().evalPush(type);
+    private void assembleLocalAccess(MethodNode mv, FunctionElement func, int localIdx, TypeElement type, boolean load, boolean set) {
         var offset = func.calculateLocalOffset(localIdx);
+        if (set) {
+            ctx().evalPop(1);
+        }
+        if (load) {
+            ctx().evalPush(type);
+        }
 
         switch (type.getRawType()) {
             case BinCodes.VAL_I32:
-                mv.visitVarInsn(ILOAD, offset);
+                if (set) mv.visitVarInsn(ISTORE, offset);
+                if (load) mv.visitVarInsn(ILOAD, offset);
                 break;
             case BinCodes.VAL_F32:
-                mv.visitVarInsn(FLOAD, offset);
+                if (set) mv.visitVarInsn(FSTORE, offset);
+                if (load) mv.visitVarInsn(FLOAD, offset);
                 break;
             case BinCodes.VAL_I64:
-                mv.visitVarInsn(LLOAD, offset);
+                if (set) mv.visitVarInsn(LSTORE, offset);
+                if (load) mv.visitVarInsn(LLOAD, offset);
                 break;
             case BinCodes.VAL_F64:
-                mv.visitVarInsn(DLOAD, offset);
+                if (set) mv.visitVarInsn(DSTORE, offset);
+                if (load) mv.visitVarInsn(DLOAD, offset);
                 break;
             default:
                 throw new ShouldNotReach();
         }
     }
 
-    private void assembleReturn(MethodNode mv) {
+    private void assembleReturn(MethodNode mv, FunctionElement func) {
         if (ctx().isEvalTypeClear()) {
             mv.visitInsn(RETURN);
             return;
         }
 
         var type = ctx().currentType();
-        if (type == TypeElement.I32_TYPE) {
-            mv.visitInsn(IRETURN);
-        } else if (type == TypeElement.I64_TYPE) {
-            mv.visitInsn(LRETURN);
-        } else if (type == TypeElement.F32_TYPE) {
-            mv.visitInsn(FRETURN);
-        } else if (type == TypeElement.F64_TYPE) {
-            mv.visitInsn(DRETURN);
+        if (func.getDelegateMethod() == null
+            || func.getDelegateMethod().getReturnType().getName().equals(type.getJavaTypeStr())) {
+            if (type == TypeElement.I32_TYPE) {
+                mv.visitInsn(IRETURN);
+            } else if (type == TypeElement.I64_TYPE) {
+                mv.visitInsn(LRETURN);
+            } else if (type == TypeElement.F32_TYPE) {
+                mv.visitInsn(FRETURN);
+            } else if (type == TypeElement.F64_TYPE) {
+                mv.visitInsn(DRETURN);
+            } else {
+                throw new ShouldNotReach();
+            }
         } else {
-            mv.visitInsn(ARETURN);
+            assembleObjectIdentity(mv);
+            mv.visitInsn(IRETURN);
         }
 
         ctx().evalPop(1);
@@ -326,6 +478,8 @@ public class WebAssemblyCompiler {
         public String className;
 
         public String internalClassName;
+
+        public String sourceName;
 
         public Stack<TypeElement> evalTypeStack = new Stack<>();
 
