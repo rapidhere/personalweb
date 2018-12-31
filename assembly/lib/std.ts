@@ -1,12 +1,5 @@
 /// generated with j2w exported.
 /// don't modify this file directly.
-export declare class java_util_Map<K, V> {
-  get($0: K): V;
-  put($0: K, $1 : V) : void;
-}
-
-export declare function allocateMap(): java_util_Map<i64, i64>;
-
 
 //////////// exported static: com.ranttu.rapid.personalweb.core.wasm.std.MathSupports
 export declare namespace Math {
@@ -25,6 +18,7 @@ export declare namespace Math {
    */
   @external("com.ranttu.rapid.personalweb.core.wasm.std.MathSupports", "powMod")
   export function powMod($0: i64, $1: i64, $2: i64): i64;
+
 }
 
 //////////// exported static: com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports

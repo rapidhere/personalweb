@@ -7,6 +7,7 @@ package com.ranttu.rapid.personalweb.core.wasm.compile;
 import com.ranttu.rapid.personalweb.core.wasm.constants.BinCodes;
 import com.ranttu.rapid.personalweb.core.wasm.exception.ShouldNotReach;
 import com.ranttu.rapid.personalweb.core.wasm.model.*;
+import com.ranttu.rapid.personalweb.core.wasm.model.raw.CodeItem;
 import com.ranttu.rapid.personalweb.core.wasm.model.raw.Instruction;
 import com.ranttu.rapid.personalweb.core.wasm.model.raw.ValueType;
 import lombok.experimental.var;
@@ -30,8 +31,35 @@ public class ModuleComposer {
         // init
         module.setFunctions(new ArrayList<>());
 
+        composeImports(module);
         composeFunctions(module);
         composeExports(module);
+    }
+
+    private void composeImports(Module module) {
+        if (module.getImportSection() == null) {
+            return;
+        }
+
+        module.getImportSection().stream().forEach(importItem -> {
+            ExposableElement ele = null;
+            if (importItem.getImportType() == BinCodes.IMP_FUNCTION) {
+                ele = composeFunction(
+                    module,
+                    (int) importItem.getTypeIdx(),
+                    -1,
+                    importItem.getName()
+                );
+                module.getFunctions().add((FunctionElement) ele);
+            }
+            // TODO: others are ignored
+
+            if (ele != null) {
+                ele.setImported(true);
+                ele.setName(importItem.getName());
+                ele.setImportModule(importItem.getModule());
+            }
+        });
     }
 
     private void composeExports(Module module) {
@@ -51,40 +79,55 @@ public class ModuleComposer {
 
     private void composeFunctions(Module module) {
         for (int funIdx = 0; funIdx < module.getFunctionSection().getSize(); funIdx++) {
-            var codeItem = module.getCodeSection().get(funIdx);
-            var typeIdx = module.getFunctionSection().get(funIdx).intValue();
-            var typeItem = module.getTypeSection().get(typeIdx);
+            module.getFunctions().add(composeFunction(
+                module,
+                module.getFunctionSection().get(funIdx).intValue(),
+                funIdx,
+                "$" + funIdx
+            ));
+        }
+    }
 
-            var funcEle = new FunctionElement();
-            funcEle.setIndex(funIdx);
+    private FunctionElement composeFunction(Module module, int typeIdx, int codeIdx, String name) {
+        CodeItem codeItem = null;
+        if (codeIdx >= 0) {
+            codeItem = module.getCodeSection().get(codeIdx);
+        }
 
-            // default name
-            funcEle.setName("$" + funIdx);
+        var typeItem = module.getTypeSection().get(typeIdx);
 
-            // parameters and result
-            funcEle.setResultType(composeTypeElement(typeItem.getResult()));
-            Stream.of(typeItem.getParameters()).forEach(
-                t -> funcEle.getParameterTypes().add(composeTypeElement(t)));
+        var funcEle = new FunctionElement();
+        funcEle.setIndex(module.getFunctions().size());
 
+        // default name
+        funcEle.setName(name);
+
+        // parameters and result
+        funcEle.setResultType(composeTypeElement(typeItem.getResult()));
+        Stream.of(typeItem.getParameters()).forEach(
+            t -> funcEle.getParameterTypes().add(composeTypeElement(t)));
+
+        if (codeItem != null) {
             // local variables
-            for (int i = 0; i < codeItem.getLocals().length; i++) {
-                for (int j = 0; j < codeItem.getLocalCounts()[i]; j++) {
-                    funcEle.getLocalTypes().add(composeTypeElement(codeItem.getLocals()[i]));
+            for (int ii = 0; ii < codeItem.getLocals().length; ii++) {
+                for (int j = 0; j < codeItem.getLocalCounts()[ii]; j++) {
+                    funcEle.getLocalTypes().add(composeTypeElement(codeItem.getLocals()[ii]));
                 }
             }
 
             // instructions
             Stream.of(codeItem.getInstructions()).forEach(
-                i -> funcEle.getInstructions().add(composeInstructionElement(funcEle, i)));
-
-            module.getFunctions().add(funcEle);
+                c -> funcEle.getInstructions().add(composeInstructionElement(funcEle, c, module)));
         }
+
+        return funcEle;
     }
 
-    private InstructionElement composeInstructionElement(FunctionElement functionElement, Instruction instruction) {
+    private InstructionElement composeInstructionElement(FunctionElement functionElement, Instruction instruction, Module module) {
         var instructionElement = new InstructionElement();
         instructionElement.setInstruction(instruction);
         instructionElement.setFunctionElement(functionElement);
+        instructionElement.setModule(module);
 
         return instructionElement;
     }

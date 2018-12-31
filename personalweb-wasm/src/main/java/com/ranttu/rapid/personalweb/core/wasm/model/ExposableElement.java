@@ -35,4 +35,9 @@ abstract public class ExposableElement {
      * exported index
      */
     protected int index;
+
+    /**
+     * import module name
+     */
+    protected String importModule;
 }

@@ -18,6 +18,7 @@ import lombok.experimental.var;
 public class InstructionElement {
     private Instruction instruction;
     private FunctionElement functionElement;
+    private Module module;
 
     public short getOpcode() {
         return instruction.getOpcode();
@@ -35,5 +36,9 @@ public class InstructionElement {
 
     public int getLocalIndex() {
         return (int) instruction.getLocalIndex();
+    }
+
+    public FunctionElement getCallFunction() {
+        return module.getFunction((int) instruction.getFunctionIndex());
     }
 }

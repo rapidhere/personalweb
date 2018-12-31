@@ -44,9 +44,6 @@ public class Module {
     private List<FunctionElement> functions;
 
     public FunctionElement getFunction(int idx) {
-        return functions.stream()
-            .filter(functionElement -> functionElement.getIndex() == idx)
-            .findFirst()
-            .orElse(null);
+        return functions.get(idx);
     }
 }

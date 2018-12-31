@@ -4,6 +4,7 @@
  */
 package com.ranttu.rapid.personalweb.core.wasm.misc;
 
+import com.ranttu.rapid.personalweb.core.wasm.exception.ShouldNotReach;
 import com.ranttu.rapid.personalweb.core.wasm.misc.asm.ClassReader;
 import com.ranttu.rapid.personalweb.core.wasm.misc.asm.util.TraceClassVisitor;
 import lombok.experimental.UtilityClass;
@@ -31,5 +32,13 @@ public class $ {
             reader.accept(new TraceClassVisitor(new PrintWriter(System.out)), 0);
             System.out.println();
         }
+    }
+
+    public <T> T should(boolean condition) {
+        if (! condition) {
+            throw new ShouldNotReach();
+        }
+
+        return null;
     }
 }

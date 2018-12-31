@@ -32,7 +32,7 @@ public class ImportItem {
      */
     @Getter
     @Setter
-    private long functionIdx;
+    private long typeIdx;
 
     /**
      * only valid for importType == IMP_TABLE

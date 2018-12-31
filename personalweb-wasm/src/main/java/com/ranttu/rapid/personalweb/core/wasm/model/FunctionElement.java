@@ -4,6 +4,7 @@
  */
 package com.ranttu.rapid.personalweb.core.wasm.model;
 
+import com.ranttu.rapid.personalweb.core.wasm.misc.$;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.var;
@@ -45,5 +46,15 @@ public class FunctionElement extends ExposableElement {
 
     public int getParameterSize() {
         return parameterTypes.size();
+    }
+
+    public boolean isStaticImport() {
+        return isImported();
+    }
+
+    public String getStaticImportClassInternalName() {
+        $.should(isStaticImport());
+
+        return getImportModule().replace('.', '/');
     }
 }

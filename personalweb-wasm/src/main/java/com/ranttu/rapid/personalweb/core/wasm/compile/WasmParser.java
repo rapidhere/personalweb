@@ -187,7 +187,7 @@ public class WasmParser {
 
             switch (item.getImportType()) {
                 case IMP_FUNCTION:
-                    item.setFunctionIdx(secIns.nextUInt());
+                    item.setTypeIdx(secIns.nextUInt());
                     break;
                 case IMP_TABLE:
                     item.setTableType(parseTableType(secIns));
