@@ -5,6 +5,7 @@
 package com.ranttu.rapid.personalweb.core.wasm.test.unit;
 
 import com.ranttu.rapid.personalweb.core.wasm.test.BaseWasmUnitTest;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -14,6 +15,7 @@ import org.testng.annotations.Test;
 public class ImportStatic extends BaseWasmUnitTest {
     @Test
     public void test0() {
-        System.out.println(callFunc("random", 10));
+        callFunc("random", 10);
+        Assert.assertEquals(callFunc("powMod", 2, 10000, 7), 2L);
     }
 }

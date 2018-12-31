@@ -57,4 +57,26 @@ public class FunctionElement extends ExposableElement {
 
         return getImportModule().replace('.', '/');
     }
+
+    public String getDeclarationName() {
+        if (isStaticImport()) {
+            return "STATIC_IMPORT$" + name;
+        } else {
+            return name;
+        }
+    }
+
+    public int calculateLocalOffset(int localIdx) {
+        int offset = 1;
+
+        for (int i = 0; i < parameterTypes.size() && i < localIdx; i++) {
+            offset += parameterTypes.get(i).getJavaTypeSize() / 4;
+        }
+
+        localIdx -= parameterTypes.size();
+        for (int i = 0; i < localTypes.size() && i < localIdx; i++) {
+            offset += localTypes.get(i).getJavaTypeSize() / 4;
+        }
+        return offset;
+    }
 }

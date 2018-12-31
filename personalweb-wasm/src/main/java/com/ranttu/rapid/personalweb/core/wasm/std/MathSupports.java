@@ -30,14 +30,14 @@ final public class MathSupports {
     }
 
     private static long powMod0(long a, long n, long m) {
-        if (m == 0) {
+        if (n == 0) {
             return 1;
-        } else if (m == 1) {
+        } else if (n == 1) {
             return a % m;
         } else {
             long r0 = powMod0(a, n >> 1, m);
 
-            if ((m & 1) == 1) {
+            if ((n & 1) == 1) {
                 return (((r0 * r0) % m) * a) % m;
             } else {
                 return (r0 * r0) % m;

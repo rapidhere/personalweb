@@ -9,8 +9,10 @@ import com.ranttu.rapid.personalweb.core.wasm.constants.ErrorCodes;
 import com.ranttu.rapid.personalweb.core.wasm.exception.ShouldNotReach;
 import com.ranttu.rapid.personalweb.core.wasm.exception.WasmCompilingException;
 import com.ranttu.rapid.personalweb.core.wasm.misc.$;
+import com.ranttu.rapid.personalweb.core.wasm.misc.AsmHelper;
 import com.ranttu.rapid.personalweb.core.wasm.misc.asm.ClassWriter;
-import com.ranttu.rapid.personalweb.core.wasm.misc.asm.MethodVisitor;
+import com.ranttu.rapid.personalweb.core.wasm.misc.asm.tree.MethodNode;
+import com.ranttu.rapid.personalweb.core.wasm.misc.asm.tree.VarInsnNode;
 import com.ranttu.rapid.personalweb.core.wasm.model.*;
 import com.ranttu.rapid.personalweb.core.wasm.model.runtime.WasmModule;
 import lombok.experimental.var;
@@ -140,9 +142,9 @@ public class WebAssemblyCompiler {
             .forEach(func -> {
                 ctx().shouldEvalTypeClear();
 
-                var mv = cw.visitMethod(
+                var mv = new MethodNode(
                     ACC_PRIVATE,
-                    func.getName(),
+                    func.getDeclarationName(),
                     func.getDesc(),
                     null,
                     new String[0]
@@ -155,7 +157,7 @@ public class WebAssemblyCompiler {
                     // push parameters
                     for (int idx = 0; idx < func.getParameterSize(); idx++) {
                         var parType = func.getParameterTypes().get(idx);
-                        assembleLocalGet(mv, idx, parType);
+                        assembleLocalGet(mv, func, idx, parType);
                     }
 
                     // call function
@@ -174,8 +176,7 @@ public class WebAssemblyCompiler {
                 }
                 // TODO: support other imports
 
-                mv.visitMaxs(0, 0);
-                mv.visitEnd();
+                mv.accept(cw);
             });
     }
 
@@ -187,9 +188,9 @@ public class WebAssemblyCompiler {
             .forEach(func -> {
                 ctx().shouldEvalTypeClear();
 
-                var mv = cw.visitMethod(
+                var mv = new MethodNode(
                     func.isExported() ? ACC_PUBLIC : ACC_PRIVATE,
-                    func.getName(),
+                    func.getDeclarationName(),
                     func.getDesc(),
                     null,
                     new String[0]
@@ -204,15 +205,17 @@ public class WebAssemblyCompiler {
                     assembleReturn(mv);
                 }
 
-                mv.visitMaxs(0, 0);
-                mv.visitEnd();
+                mv.accept(cw);
             });
     }
 
-    private void assembleInstruction(MethodVisitor mv, InstructionElement instruction) {
+    private void assembleInstruction(MethodNode mv, InstructionElement instruction) {
         switch (instruction.getOpcode()) {
             case BinCodes.OP_LOCALGET: {
-                assembleLocalGet(mv, instruction.getLocalIndex(), instruction.getLocalType());
+                assembleLocalGet(mv,
+                    instruction.getFunctionElement(),
+                    instruction.getLocalIndex(),
+                    instruction.getLocalType());
                 break;
             }
             case BinCodes.OP_I32ADD: {
@@ -241,13 +244,16 @@ public class WebAssemblyCompiler {
         }
     }
 
-    private void assembleDirectCall(MethodVisitor mv, FunctionElement func) {
-        mv.visitVarInsn(ALOAD, 0);
+    private void assembleDirectCall(MethodNode mv, FunctionElement func) {
+        AsmHelper.insertInsnAt(
+            mv,
+            mv.instructions.size() - func.getParameterSize() - 1,
+            new VarInsnNode(ALOAD, 0));
 
         mv.visitMethodInsn(
             INVOKESPECIAL,
             ctx().internalClassName,
-            func.getName(),
+            func.getDeclarationName(),
             func.getDesc(),
             false
         );
@@ -256,28 +262,29 @@ public class WebAssemblyCompiler {
         ctx().evalPush(func.getResultType());
     }
 
-    private void assembleLocalGet(MethodVisitor mv, int localIdx, TypeElement type) {
+    private void assembleLocalGet(MethodNode mv, FunctionElement func, int localIdx, TypeElement type) {
         ctx().evalPush(type);
+        var offset = func.calculateLocalOffset(localIdx);
 
         switch (type.getRawType()) {
             case BinCodes.VAL_I32:
-                mv.visitVarInsn(ILOAD, localIdx + 1);
+                mv.visitVarInsn(ILOAD, offset);
                 break;
             case BinCodes.VAL_F32:
-                mv.visitVarInsn(FLOAD, localIdx + 1);
+                mv.visitVarInsn(FLOAD, offset);
                 break;
             case BinCodes.VAL_I64:
-                mv.visitVarInsn(LLOAD, localIdx + 1);
+                mv.visitVarInsn(LLOAD, offset);
                 break;
             case BinCodes.VAL_F64:
-                mv.visitVarInsn(DLOAD, localIdx + 1);
+                mv.visitVarInsn(DLOAD, offset);
                 break;
             default:
                 throw new ShouldNotReach();
         }
     }
 
-    private void assembleReturn(MethodVisitor mv) {
+    private void assembleReturn(MethodNode mv) {
         if (ctx().isEvalTypeClear()) {
             mv.visitInsn(RETURN);
             return;
