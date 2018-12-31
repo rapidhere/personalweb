@@ -1,9 +1,10 @@
-import { sys, Math } from '../lib/std';
+import { 
+    sys, 
+    com_ranttu_rapid_personalweb_core_wasm_rt_WasmModule as WasmModule 
+} from '../lib/std';
 
-export function random(a : i64) : i64 {
-    return sys.currentTimeMillis() + a;
-}
-
-export function powMod(a: i64, b: i64, c: i64): i64 {
-    return Math.powMod(a, b, c);
+export function testMeta(): void {
+    let module: WasmModule = sys.ref();
+    sys.infoln(module.getSourceName());
+    sys.infoln(module.getMetaVersion());
 }
