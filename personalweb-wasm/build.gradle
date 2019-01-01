@@ -25,7 +25,6 @@ j2wexport {
 
     exports = [
             'com.ranttu.rapid.personalweb.core.wasm.rt.WasmModule',
-            'com.ranttu.rapid.personalweb.core.wasm.std.MathSupports',
             'com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports'
     ]
 }

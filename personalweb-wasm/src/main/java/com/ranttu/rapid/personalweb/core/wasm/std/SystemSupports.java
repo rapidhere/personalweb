@@ -6,7 +6,6 @@ package com.ranttu.rapid.personalweb.core.wasm.std;
 
 import com.ranttu.rapid.personalweb.core.wasm.compile.export.Export;
 import com.ranttu.rapid.personalweb.core.wasm.compile.export.J2WExport;
-import com.ranttu.rapid.personalweb.core.wasm.exception.ShouldNotReach;
 import com.ranttu.rapid.personalweb.core.wasm.rt.WasmModule;
 
 /**
@@ -30,9 +29,20 @@ public class SystemSupports {
         System.exit(status);
     }
 
-    @Export(buildIn = true)
-    public static WasmModule ref() {
-        throw new ShouldNotReach();
+    @Export
+    public static WasmModule ref(WasmModule t) {
+        return t;
+    }
+
+    @Export
+    public static void printModuleMeta(WasmModule t, boolean src, boolean ver) {
+        if (src) {
+            infoln("src: " + t.getSourceName());
+        }
+
+        if (ver) {
+            infoln("ver: " + t.getMetaVersion());
+        }
     }
 
     @Export

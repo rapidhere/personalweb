@@ -4,8 +4,6 @@
  */
 package com.ranttu.rapid.personalweb.core.wasm.test;
 
-import com.ranttu.rapid.personalweb.core.wasm.compile.WebAssemblyCompiler;
-import lombok.experimental.var;
 import org.testng.annotations.Test;
 
 /**
@@ -17,10 +15,6 @@ public class DemoTest {
 
     @Test
     public void test0() {
-        var stream = getClass()
-            .getResourceAsStream("/testres/demo2.wasm");
-        var module = new WebAssemblyCompiler().compile(stream, "demo.wasm");
-
-        System.out.println(module);
+        new Thread(() -> System.out.print("hello world"));
     }
 }

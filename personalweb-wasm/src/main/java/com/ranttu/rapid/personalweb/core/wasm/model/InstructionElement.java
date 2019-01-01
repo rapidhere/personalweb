@@ -4,6 +4,7 @@
  */
 package com.ranttu.rapid.personalweb.core.wasm.model;
 
+import com.ranttu.rapid.personalweb.core.wasm.constants.BinCodes;
 import com.ranttu.rapid.personalweb.core.wasm.model.raw.Instruction;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +32,17 @@ public class InstructionElement {
         } else {
             return functionElement.getLocalTypes().get(
                 localIdx - functionElement.getParameterSize());
+        }
+    }
+
+    public Object getConst() {
+        switch (getOpcode()) {
+            case BinCodes.OP_I32CONST:
+                return (int) instruction.getIntConst();
+            case BinCodes.OP_I64CONST:
+                return instruction.getIntConst();
+            default:
+                return instruction.getFloatConst();
         }
     }
 

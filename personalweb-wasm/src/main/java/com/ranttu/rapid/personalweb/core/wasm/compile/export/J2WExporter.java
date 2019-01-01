@@ -6,6 +6,7 @@ package com.ranttu.rapid.personalweb.core.wasm.compile.export;
 
 import com.google.common.base.Strings;
 import com.ranttu.rapid.personalweb.core.wasm.exception.WasmUnknownError;
+import com.ranttu.rapid.personalweb.core.wasm.rt.WasmModule;
 import lombok.experimental.var;
 
 import java.lang.reflect.Method;
@@ -61,7 +62,7 @@ public class J2WExporter {
                 appendMetaInfo(clz, m, "virtual", "  ");
 
                 sb.append("  ");
-                appendMethodSignature(m);
+                appendMethodSignature(m, false);
                 sb.append("\n\n");
             });
         sb.append("}\n");
@@ -100,7 +101,7 @@ public class J2WExporter {
 
                 // declare begin
                 sb.append("  export function ");
-                appendMethodSignature(m);
+                appendMethodSignature(m, true);
                 sb.append("\n\n");
             });
 
@@ -124,7 +125,7 @@ public class J2WExporter {
         sb.append(indent).append(" */\n");
     }
 
-    private void appendMethodSignature(Method m) {
+    private void appendMethodSignature(Method m, boolean isStatic) {
 
         sb.append(m.getName());
 
@@ -132,6 +133,9 @@ public class J2WExporter {
         sb.append('(');
         int idx = 0;
         for (var parameterType : m.getParameterTypes()) {
+            if (isStatic && idx == 0 && parameterType == WasmModule.class) {
+                continue;
+            }
             sb.append('$').append(idx)
                 .append(": ").append(toTsType(parameterType))
                 .append(", ");
@@ -146,7 +150,9 @@ public class J2WExporter {
     }
 
     private String toTsType(Class clz) {
-        if (clz == int.class) {
+        if (clz == boolean.class) {
+            return "boolean";
+        } else if (clz == int.class) {
             return "i32";
         } else if (clz == long.class) {
             return "i64";

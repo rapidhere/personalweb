@@ -44,7 +44,6 @@ abstract public class BaseWasmUnitTest {
             .findFirst();
         var argList = new ArrayList<Object>();
         Collections.addAll(argList, args);
-        argList.add(modules.get());
 
         if (m.isPresent()) {
             return m.get().invoke(module, argList.toArray());

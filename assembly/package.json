@@ -4,7 +4,7 @@
     "assemblyscript": "AssemblyScript/assemblyscript"
   },
   "scripts": {
-    "build-debug": "asc src/index.ts -b output/index.wasm -t output/index.wast --debug --noLib",
-    "build-optimize": "asc src/index.ts -b output/index.wasm -t output/index.wast --optimize --noLib"
+    "build-debug": "asc src/index.ts -b output/index.wasm -t output/index.wast --importMemory --importTable --debug",
+    "build-optimize": "asc src/index.ts -b output/index.wasm -t output/index.wast --importMemory --importTable --optimize"
   }
 }

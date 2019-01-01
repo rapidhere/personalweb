@@ -19,30 +19,6 @@ export declare class com_ranttu_rapid_personalweb_core_wasm_rt_WasmModule {
 
 }
 
-export declare class string {
-  
-}
-
-//////////// exported static: com.ranttu.rapid.personalweb.core.wasm.std.MathSupports
-export declare namespace Math {
-  /**
-   * @java_class  com.ranttu.rapid.personalweb.core.wasm.std.MathSupports
-   * @java_method sqrt double  
-   * @java_invoke static
-   */
-  @external("com.ranttu.rapid.personalweb.core.wasm.std.MathSupports", "sqrt")
-  export function sqrt($0: f64): f64;
-
-  /**
-   * @java_class  com.ranttu.rapid.personalweb.core.wasm.std.MathSupports
-   * @java_method powMod long long long  
-   * @java_invoke static
-   */
-  @external("com.ranttu.rapid.personalweb.core.wasm.std.MathSupports", "powMod")
-  export function powMod($0: i64, $1: i64, $2: i64): i64;
-
-}
-
 //////////// exported static: com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports
 export declare namespace sys {
   /**
@@ -71,7 +47,7 @@ export declare namespace sys {
 
   /**
    * @java_class  com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports
-   * @java_method ref  
+   * @java_method ref com.ranttu.rapid.personalweb.core.wasm.rt.WasmModule  
    * @java_invoke static
    */
   @external("com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports", "ref")
@@ -87,11 +63,11 @@ export declare namespace sys {
 
   /**
    * @java_class  com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports
-   * @java_method currentTimeNanos  
+   * @java_method printModuleMeta com.ranttu.rapid.personalweb.core.wasm.rt.WasmModule boolean boolean  
    * @java_invoke static
    */
-  @external("com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports", "currentTimeNanos")
-  export function currentTimeNanos(): i64;
+  @external("com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports", "printModuleMeta")
+  export function printModuleMeta($0: boolean, $1: boolean): void;
 
   /**
    * @java_class  com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports
@@ -100,6 +76,14 @@ export declare namespace sys {
    */
   @external("com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports", "infoln")
   export function infoln($0: string): void;
+
+  /**
+   * @java_class  com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports
+   * @java_method currentTimeNanos  
+   * @java_invoke static
+   */
+  @external("com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports", "currentTimeNanos")
+  export function currentTimeNanos(): i64;
 
   /**
    * @java_class  com.ranttu.rapid.personalweb.core.wasm.std.SystemSupports
